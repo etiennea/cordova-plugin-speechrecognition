@@ -105,7 +105,9 @@
                 }
                 counter++;
             }
-
+            
+            [resultArray addObject: (result.isFinal ? @"true" : @"false")];
+          
             NSArray *transcriptions = [NSArray arrayWithArray:resultArray];
 
             NSLog(@"startListening() recognitionTask result array: %@", transcriptions.description);
