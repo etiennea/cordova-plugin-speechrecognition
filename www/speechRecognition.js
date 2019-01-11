@@ -4,7 +4,11 @@ module.exports = {
   },
   startListening: function(successCallback, errorCallback, options) {
     options = options || {};
-    cordova.exec(successCallback, errorCallback, 'SpeechRecognition', 'startListening', [ options.language, options.matches, options.prompt, options.showPartial, options.showPopup ]);
+    cordova.exec((items) => {
+      let isFinal = items[items.length -1];
+      items = items.pop();
+      successCallback(items, isFinal);
+    }, errorCallback, 'SpeechRecognition', 'startListening', [ options.language, options.matches, options.prompt, options.showPartial, options.showPopup ]);
   },
   stopListening: function(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, 'SpeechRecognition', 'stopListening', []);
