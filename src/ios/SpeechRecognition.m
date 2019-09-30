@@ -24,6 +24,8 @@
 @property (strong, nonatomic) AVAudioEngine *audioEngine;
 @property (strong, nonatomic) SFSpeechAudioBufferRecognitionRequest *recognitionRequest;
 @property (strong, nonatomic) SFSpeechRecognitionTask *recognitionTask;
+// True if this recognition can handle requests with requiresOnDeviceRecognition set to true
+@property (nonatomic) BOOL supportsOnDeviceRecognition API_AVAILABLE(ios(13));
 
 @end
 
