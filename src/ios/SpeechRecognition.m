@@ -24,8 +24,6 @@
 @property (strong, nonatomic) AVAudioEngine *audioEngine;
 @property (strong, nonatomic) SFSpeechAudioBufferRecognitionRequest *recognitionRequest;
 @property (strong, nonatomic) SFSpeechRecognitionTask *recognitionTask;
-// True if this recognition can handle requests with requiresOnDeviceRecognition set to true
-@property (nonatomic) BOOL supportsOnDeviceRecognition API_AVAILABLE(ios(13));
 
 @end
 
@@ -90,6 +88,7 @@
 
     self.recognitionRequest = [[SFSpeechAudioBufferRecognitionRequest alloc] init];
     self.recognitionRequest.shouldReportPartialResults = showPartial;
+    self.recognitionRequest.requiresOnDeviceRecognition = YES;
 
     AVAudioInputNode *inputNode = self.audioEngine.inputNode;
     AVAudioFormat *format = [inputNode outputFormatForBus:0];
