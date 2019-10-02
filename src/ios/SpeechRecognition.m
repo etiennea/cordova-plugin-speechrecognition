@@ -70,7 +70,8 @@
     NSString* language = [command argumentAtIndex:0 withDefault:DEFAULT_LANGUAGE];
     int matches = [[command argumentAtIndex:1 withDefault:@(DEFAULT_MATCHES)] intValue];
     BOOL showPartial = [[command argumentAtIndex:3 withDefault:@(NO)] boolValue];
-
+    BOOL onDevice = [[command argumentAtIndex:4 withDefault:@(YES)] boolValue];
+  
     NSLocale *locale = [[NSLocale alloc] initWithLocaleIdentifier:language];
     self.speechRecognizer = [[SFSpeechRecognizer alloc] initWithLocale:locale];
     self.audioEngine = [[AVAudioEngine alloc] init];
@@ -88,8 +89,11 @@
 
     self.recognitionRequest = [[SFSpeechAudioBufferRecognitionRequest alloc] init];
     self.recognitionRequest.shouldReportPartialResults = showPartial;
-    self.recognitionRequest.requiresOnDeviceRecognition = YES;
-
+    
+    if (@available(iOS 13, *)) {
+        self.recognitionRequest.requiresOnDeviceRecognition = onDevice;
+    }
+  
     AVAudioInputNode *inputNode = self.audioEngine.inputNode;
     AVAudioFormat *format = [inputNode outputFormatForBus:0];
 
