@@ -5,7 +5,7 @@ module.exports = {
   startListening: function(successCallback, errorCallback, options) {
     options = options || {};
     cordova.exec((items) => {
-      let isFinal = items[items.length -1];
+      var isFinal = items[items.length -1];
       items.pop();
       successCallback(items, isFinal);
     }, errorCallback, 'SpeechRecognition', 'startListening', 
