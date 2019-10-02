@@ -8,7 +8,15 @@ module.exports = {
       let isFinal = items[items.length -1];
       items.pop();
       successCallback(items, isFinal);
-    }, errorCallback, 'SpeechRecognition', 'startListening', [ options.language, options.matches, options.prompt, options.showPartial, options.showPopup ]);
+    }, errorCallback, 'SpeechRecognition', 'startListening', 
+                 [ 
+                  options.language, 
+                  options.matches, 
+                  options.prompt, 
+                  options.showPartial, 
+                  options.showPopup, 
+                  options.onDevice 
+                 ]);
   },
   stopListening: function(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, 'SpeechRecognition', 'stopListening', []);
