@@ -84,7 +84,8 @@ public class SpeechRecognition extends CordovaPlugin {
 
     try {
       if (IS_RECOGNITION_AVAILABLE.equals(action)) {
-        PluginResult result = new PluginResult(isRecognitionAvailable() ? PluginResult.Status.OK : PluginResult.Status.ERROR);
+        boolean available = isRecognitionAvailable();
+        PluginResult result = new PluginResult(PluginResult.Status.OK, available);
         callbackContext.sendPluginResult(result);
         return true;
       }
@@ -206,7 +207,7 @@ public class SpeechRecognition extends CordovaPlugin {
   }
 
   private void hasAudioPermission() {
-    PluginResult result = new PluginResult(audioPermissionGranted(RECORD_AUDIO_PERMISSION) ? PluginResult.Status.OK : PluginResult.Status.ERROR, MISSING_PERMISSION);
+    PluginResult result = new PluginResult(PluginResult.Status.OK, audioPermissionGranted(RECORD_AUDIO_PERMISSION));
     this.callbackContext.sendPluginResult(result);
   }
 
@@ -280,6 +281,25 @@ public class SpeechRecognition extends CordovaPlugin {
     public void onError(int errorCode) {
       String errorMessage = getErrorText(errorCode);
       Log.d(LOG_TAG, "Error: " + errorMessage);
+
+      // HACK: We swallow these three errors as they're popping up in non-critical situations:
+      if (
+        errorCode == SpeechRecognizer.ERROR_SPEECH_TIMEOUT ||
+        errorCode == SpeechRecognizer.ERROR_CLIENT ||
+        errorCode == SpeechRecognizer.ERROR_NO_MATCH
+      ) {
+        return;
+      }
+
+      // HACK: Swallow the `ERROR_RECOGNIZER_BUSY` non-critical error and we need to cancel the
+      //   previous speech recognition task if it exists:
+      if (errorCode == SpeechRecognizer.ERROR_RECOGNIZER_BUSY) {
+        if (recognizer != null) {
+          recognizer.cancel();
+        }
+        return;
+      }
+
       callbackContext.error(errorMessage);
     }
 
@@ -292,8 +312,6 @@ public class SpeechRecognition extends CordovaPlugin {
       ArrayList<String> matches = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
       Log.d(LOG_TAG, "SpeechRecognitionListener partialResults: " + matches);
       JSONArray matchesJSON = new JSONArray(matches);
-      jsonObj = new JSONObject(false);
-      matchesJSON.add(jsonObj);
       try {
         if (matches != null
                 && matches.size() > 0
@@ -320,8 +338,6 @@ public class SpeechRecognition extends CordovaPlugin {
       Log.d(LOG_TAG, "SpeechRecognitionListener results: " + matches);
       try {
         JSONArray jsonMatches = new JSONArray(matches);
-        jsonObj = new JSONObject(true);
-        jsonMatches.add(jsonObj);
         callbackContext.success(jsonMatches);
       } catch (Exception e) {
         e.printStackTrace();
